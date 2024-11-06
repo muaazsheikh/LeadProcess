@@ -1,134 +1,297 @@
-import React, { useState } from 'react';
-import { Box, Grid, Card, CardContent, Typography, Button, Avatar, TextField, AppBar, Toolbar, IconButton, FilledTextFieldProps, OutlinedTextFieldProps, StandardTextFieldProps, TextFieldVariants } from '@mui/material';
-import { DatePicker } from '@mui/lab';
-import { Phone, Email, LocationOn, FilterList, CalendarToday, Sort } from '@mui/icons-material';
-import { styled } from '@mui/system';
-import { JSX } from 'react/jsx-runtime';
+import React, { useState } from "react";
+import {
+  Box,
+  Grid,
+  Typography,
+  Card,
+  CardContent,
+  Chip,
+  Avatar,
+  IconButton,
+  Button,
+  Divider,
+  MenuItem,
+  Select,
+  CircularProgress,
+  Stack,
+} from "@mui/material";
+import {
+  Phone,
+  Email,
+  LocationOn,
+  ExpandMore,
+  MoreVert,
+  Edit,
+  AttachFile,
+  CameraAlt,
+} from "@mui/icons-material";
+import Sidebar from "./Sidebar";
+import Header from "./Header";
+import Pipeline from "./Pipeline";
 
-// Mock Data for Leads
-const leadsData = [
-  { 
-    id: 1, 
-    name: 'Brown\'s Bathroom Remodel', 
-    phone: '(907) 555-0101', 
-    email: 'example@email.com', 
-    address: '4517 Washington Ave. Manchester, Kentucky 39495', 
-    status: 'No Follow up', 
-    revenue: '$120,000.00', 
-    likelihood: '75%', 
-    salesRep: ['https://via.placeholder.com/32', 'https://via.placeholder.com/32'] 
+interface Lead {
+  followUpStatus: any;
+  id: number;
+  name: string;
+  address: string;
+  revenue: string;
+  likelihood: string;
+  contact: string;
+  email: string;
+  projectInfo: string;
+}
+
+const leadsData: Lead[] = [
+  {
+    id: 1,
+    name: "Brown's Bathroom Remodel",
+    address: "4517 Washington Ave. Manchester, KY",
+    revenue: "$120,000.00",
+    likelihood: "75",
+    contact: "(907) 555-0101",
+    email: "example@email.com",
+    projectInfo: "Bathroom modeling",
+    followUpStatus: true,
   },
-  { 
-    id: 2, 
-    name: 'Nijum\'s Bedroom Remodel', 
-    phone: '(907) 555-0101', 
-    email: 'example@email.com', 
-    address: '4517 Washington Ave. Manchester, Kentucky 39495', 
-    status: 'Follow up', 
-    revenue: '$150,000.00', 
-    likelihood: '80%', 
-    salesRep: ['https://via.placeholder.com/32', 'https://via.placeholder.com/32']
+  {
+    id: 2,
+    name: "Nijum's Bedroom Remodel",
+    address: "4517 Washington Ave. Manchester, KY",
+    revenue: "$150,000.00",
+    likelihood: "80",
+    contact: "(907) 555-0202",
+    email: "nijum@example.com",
+    projectInfo: "Bedroom modeling",
+    followUpStatus: false,
   },
-  // Add more leads as needed
 ];
 
-const stages = [
-  { name: 'New', count: 20 },
-  { name: 'Contact', count: 50 },
-  { name: 'Upload Scope', count: 30 },
-  { name: 'Estimate', count: 12 },
-  { name: 'Sign Contract', count: 8 },
-  { name: 'Payment', count: 2 },
-  { name: 'Installation', count: 10 },
-  { name: 'Completed', count: 10 },
-  { name: 'Feedback', count: 30 },
-];
+const LeadsDashboard: React.FC = () => {
+  const [selectedMenu, setSelectedMenu] = useState<string>("Dashboard");
+  const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([
+    null,
+    null,
+  ]);
 
-const Sidebar = styled(Box)(({ theme }) => ({
-  width: '250px',  // Adjust the width of the sidebar
-  backgroundColor: '#2e3b4e',
-  color: '#fff',
-  height: '100vh',
-  display: 'flex',
-  flexDirection: 'column',
-  padding: '20px',
-}));
+  const renderContent = () => {
+    if (selectedMenu === "Lead Pipeline") {
+      return (
+        <>
+          <Header dateRange={dateRange} setDateRange={setDateRange} />
 
-const LeadsDashboard = () => {
-  const [selectedStage, setSelectedStage] = useState('New');
-  const [dateRange, setDateRange] = useState([null, null]);
+          <Pipeline />
+          <Box p={3}>
+            <Grid container spacing={2}>
+              {leadsData.map((lead) => (
+                <Grid item xs={12} key={lead.id}>
+                  <Card
+                    sx={{
+                      display: "flex",
+                      p: 2,
+                      borderRadius: 2,
+                      boxShadow: 3,
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    {/* Follow-up Status Indicator */}
+                    <Box
+                      sx={{
+                        minWidth: 90,
+                        height: "100%",
+                        bgcolor: lead.followUpStatus ? "#C8E6C9" : "#E0F7FA",
+                        borderRadius: 1,
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        py: 1,
+                      }}
+                    >
+                      <Typography variant="caption" color="textSecondary">
+                        No
+                      </Typography>
+                      <Typography variant="subtitle2" color="primary">
+                        Follow up
+                      </Typography>
+                    </Box>
+
+                    {/* Lead Info */}
+                    <Box flexGrow={1} pl={2}>
+                      <Stack direction="row" alignItems="center" spacing={1}>
+                        <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+                          {lead.name}
+                        </Typography>
+                        <Typography variant="caption" color="textSecondary">
+                          0185000
+                        </Typography>
+                      </Stack>
+                      <Stack
+                        direction="row"
+                        spacing={1}
+                        alignItems="center"
+                        mt={0.5}
+                      >
+                        <Phone fontSize="small" color="action" />
+                        <Typography variant="body2" color="textSecondary">
+                          {lead.contact}
+                        </Typography>
+                        <Email fontSize="small" color="action" sx={{ ml: 2 }} />
+                        <Typography variant="body2" color="textSecondary">
+                          {lead.email}
+                        </Typography>
+                      </Stack>
+                      <Stack
+                        direction="row"
+                        spacing={1}
+                        alignItems="center"
+                        mt={0.5}
+                      >
+                        <LocationOn fontSize="small" color="action" />
+                        <Typography variant="body2" color="textSecondary">
+                          {lead.address}
+                        </Typography>
+                      </Stack>
+                      <Button
+                        size="small"
+                        startIcon={<ExpandMore />}
+                        sx={{
+                          mt: 1,
+                          textTransform: "none",
+                          fontSize: "0.8rem",
+                          color: "textSecondary",
+                        }}
+                      >
+                        Show More
+                      </Button>
+                    </Box>
+
+                    {/* Project Info and Stats */}
+                    <Box sx={{ mx: 2, minWidth: 150, textAlign: "left" }}>
+                      <Typography
+                        variant="caption"
+                        color="textSecondary"
+                        sx={{ display: "block" }}
+                      >
+                        Project info
+                      </Typography>
+                      <Select
+                        value={lead.projectInfo}
+                        size="small"
+                        sx={{
+                          mt: 0.5,
+                          width: "100%",
+                          fontSize: "0.9rem",
+                          backgroundColor: "#f5f5f5",
+                        }}
+                      >
+                        <MenuItem value="Bathroom modeling">
+                          Bathroom modeling
+                        </MenuItem>
+                        <MenuItem value="Bedroom modeling">
+                          Bedroom modeling
+                        </MenuItem>
+                      </Select>
+                    </Box>
+
+                    <Box sx={{ mx: 2, textAlign: "center" }}>
+                      <Typography
+                        variant="caption"
+                        color="textSecondary"
+                        sx={{ display: "block" }}
+                      >
+                        Est. Revenue
+                      </Typography>
+                      <Typography variant="body1" fontWeight="bold">
+                        {lead.revenue}
+                      </Typography>
+                    </Box>
+
+                    <Box sx={{ mx: 2, textAlign: "center" }}>
+                      <Typography
+                        variant="caption"
+                        color="textSecondary"
+                        sx={{ display: "block" }}
+                      >
+                        Likelihood of Sale
+                      </Typography>
+                      <Box
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="center"
+                      >
+                        <CircularProgress
+                          variant="determinate"
+                          value={parseInt(lead.likelihood)}
+                          size={40}
+                          color="primary"
+                        />
+                        <Typography
+                          variant="body2"
+                          sx={{ ml: 1, fontWeight: "bold", fontSize: "1rem" }}
+                        >
+                          {lead.likelihood}%
+                        </Typography>
+                      </Box>
+                    </Box>
+
+                    <Box sx={{ mx: 2, textAlign: "center" }}>
+                      <Typography
+                        variant="caption"
+                        color="textSecondary"
+                        sx={{ display: "block" }}
+                      >
+                        Sales Rep
+                      </Typography>
+                      <Stack direction="row" spacing={-1} mt={1}>
+                        <Avatar
+                          src="/path/to/avatar1.jpg"
+                          sx={{ width: 24, height: 24 }}
+                        />
+                        <Avatar
+                          src="/path/to/avatar2.jpg"
+                          sx={{ width: 24, height: 24 }}
+                        />
+                        <Avatar
+                          src="/path/to/avatar3.jpg"
+                          sx={{ width: 24, height: 24 }}
+                        />
+                      </Stack>
+                    </Box>
+
+                    {/* Action Icons */}
+                    <Box>
+                      <IconButton size="small">
+                        <AttachFile fontSize="small" />
+                      </IconButton>
+                      <IconButton size="small">
+                        <Edit fontSize="small" />
+                      </IconButton>
+                      <IconButton size="small">
+                        <CameraAlt fontSize="small" />
+                      </IconButton>
+                      <IconButton size="small">
+                        <MoreVert fontSize="small" />
+                      </IconButton>
+                    </Box>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+          </Box>
+        </>
+      );
+    } else {
+      return (
+        <Typography variant="h5">Welcome to the {selectedMenu}</Typography>
+      );
+    }
+  };
 
   return (
-    <Box sx={{ display: 'flex' }}>
-      {/* Sidebar */}
-      <Sidebar>
-        <Typography variant="h6" sx={{ mb: 4 }}>CONSTRUCTION SERVICE</Typography>
-        <Box component="nav" sx={{ mb: 4 }}>
-          <Typography variant="body2" sx={{ mb: 2 }}>Main Menu</Typography>
-          <Typography variant="body2" sx={{ mb: 2 }}><Button sx={{ color: '#fff', textTransform: 'none', mb: 2 }}>Dashboard</Button></Typography>
-          <Typography variant="body2" sx={{ mb: 2 }}><Button sx={{ color: '#fff', textTransform: 'none', mb: 2 }}>Time Tracking</Button></Typography>
-          <Typography variant="body2" sx={{ mb: 2 }}><Button sx={{ color: '#fff', textTransform: 'none', mb: 2 }}>Task List</Button></Typography>
-          <Typography variant="body2" sx={{ mb: 2 }}><Button sx={{ color: '#fff', textTransform: 'none', mb: 2 }}>Lead Pipeline</Button></Typography>
-           </Box>
-
-      </Sidebar>
-
-      <Box sx={{ flexGrow: 1, p: 3, backgroundColor: '#f4f6f8' }}>
-        {/* Header */}
-        <AppBar position="static" color="transparent" elevation={0}>
-          <Toolbar sx={{ justifyContent: 'space-between' }}>
-            <Box>
-              <Button startIcon={<Sort />} color="primary">Sort by</Button>
-              <Button startIcon={<FilterList />} color="primary">Filters</Button>
-            </Box>
-            <DatePicker
-              label="Select Date Range"
-              value={dateRange}
-              onChange={(newValue: React.SetStateAction<null[]>) => setDateRange(newValue)}
-              renderInput={(params: JSX.IntrinsicAttributes & { variant?: TextFieldVariants | undefined; } & Omit<OutlinedTextFieldProps | FilledTextFieldProps | StandardTextFieldProps, "variant">) => <TextField {...params} variant="outlined" size="small" />}
-            />
-          </Toolbar>
-        </AppBar>
-
-        {/* Stage Filters */}
-        <Grid container spacing={1} sx={{ mt: 3 }}>
-          {stages.map((stage) => (
-            <Grid item key={stage.name}>
-              <Button
-                variant={selectedStage === stage.name ? 'contained' : 'outlined'}
-                color="primary"
-                onClick={() => setSelectedStage(stage.name)}
-                sx={{
-                  borderRadius: '20px',
-                  padding: '6px 12px',
-                  textTransform: 'none',
-                }}
-              >
-                {stage.name} ({stage.count})
-              </Button>
-            </Grid>
-          ))}
-        </Grid>
-
-        {/* Main Content Section */}
-        <Typography variant="h5" sx={{ mt: 4 }}>
-          Main Content Section (Leads and filters)
-        </Typography>
-        <Grid container spacing={3} sx={{ mt: 3 }}>
-          {leadsData.map((lead) => (
-            <Grid item xs={12} md={6} lg={4} key={lead.id}>
-              <Card sx={{ borderRadius: '12px' }}>
-                <CardContent>
-                  <Typography variant="h6" fontWeight="bold">{lead.name}</Typography>
-                  <Typography variant="body2">{lead.address}</Typography>
-                  <Typography variant="body2">Revenue: {lead.revenue}</Typography>
-                  <Typography variant="body2">Likelihood: {lead.likelihood}</Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
-      </Box>
+    <Box sx={{ display: "flex" }}>
+      <Sidebar selectedMenu={selectedMenu} setSelectedMenu={setSelectedMenu} />
+      <Box sx={{ flexGrow: 1, p: 3 }}>{renderContent()}</Box>
     </Box>
   );
 };
